@@ -3,6 +3,7 @@ import io from 'socket.io-client'
 import { Form, Button, Alert, InputGroup } from 'react-bootstrap';
 
 const socket = io.connect("http://localhost:8080");
+const ms_arr = []
 
 class CHATROOM extends React.Component {
     constructor(props) {
@@ -15,7 +16,6 @@ class CHATROOM extends React.Component {
     };
     async componentDidMount() {
         this.setState({ userDetails: this.props.data })
-        let ms_arr = []
         await socket.on("receive_message", (data) => {
             // this.state.messagelist.push(data);
             ms_arr.push(data)
@@ -23,6 +23,18 @@ class CHATROOM extends React.Component {
                 console.log(this.state.messagelist);
             })
         })
+    }
+    onSendButtonPressed = async () => {
+        if (this.state.currentMessage !== '') {
+            let msgData = {
+                room: this.state.userDetails.roomname,
+                author: this.state.userDetails.username,
+                message: this.state.currentMessage
+            }
+            await socket.emit("send_message", msgData);
+            ms_arr.push(msgData);
+            this.setState({ currentMessage: '', messagelist: msgData });
+        }
     }
     render() {
         return (
@@ -52,8 +64,13 @@ class CHATROOM extends React.Component {
                                                 })
                                             }}
                                         />
-                                        <Button variant="primary" id="button-addon2">
-                                            Button
+                                        <Button
+                                        onClick={()=>{
+                                            this.onSendButtonPressed();
+                                        }}
+                                        variant="primary" 
+                                        id="button-addon2">
+                                            Send
                                         </Button>
                                     </InputGroup>
                                 </div>

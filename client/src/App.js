@@ -25,7 +25,7 @@ class App extends React.Component {
   }
   render() {
     return (
-      <>
+      <div>
         {!this.state.validInput ?
           (
             <div className='container'>
@@ -63,7 +63,7 @@ class App extends React.Component {
               <CHATROOM data={this.state.userDetails}/>
             </div>
           )}
-      </>
+      </div>
     );
   }
 }
